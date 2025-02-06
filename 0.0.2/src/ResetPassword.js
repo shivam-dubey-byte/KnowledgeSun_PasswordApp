@@ -21,7 +21,7 @@ const ResetPassword = () => {
     }
 
     // Construct API URL dynamically
-    const apiUrl = `https://knowledgesunapi.quantumsoftdev.in/${token}`;//`https://edu-auth.vercel.app/auth/reset-password/${token}`;
+    const apiUrl = `https://knowledgesunapi.quantumsoftdev.in/auth/reset-password/${token}`;//`https://edu-auth.vercel.app/auth/reset-password/${token}`;
 
     try {
       const response = await fetch(apiUrl, {
