@@ -21,10 +21,10 @@ const ResetPassword = () => {
     }
 
     // Construct API URL dynamically
-    const apiUrl = "http://edu-auth.vercel.app/auth/reset-password/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2E0MTNiOTM0OWEzZTAwMDM5MmQzOWIiLCJlbWFpbCI6ImR1YmV5c2hpdmFtMTIzMzIxQGdtYWlsLmNvbSIsImlhdCI6MTczODgwNjIyNCwiZXhwIjoxNzM4ODA5ODI0fQ.jbiZ0p8jg3gbGwIj3qKxKJzUwV5q8UU2PMIMNldzhxM";//`https://edu-auth.vercel.app/auth/reset-password/${token}`;
+    const apiUrl = `https://knowledgesunapi.quantumsoftdev.in/${token}`;//`https://edu-auth.vercel.app/auth/reset-password/${token}`;
 
     try {
-      const response = await fetch("https://edu-auth.vercel.app/auth/reset-password/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2EzZWU5ZTNlODZmODVmYjBjZmUyZWQiLCJlbWFpbCI6ImR1YmV5c2hpdmFtcmFqQGdtYWlsLmNvbSIsImlhdCI6MTczODgxNTAyOCwiZXhwIjoxNzM4ODE4NjI4fQ.i1tC7-omAj34jj3JMlbdp6O-AUDg97hG272QEoBfrzQ", {
+      const response = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ newPassword }), // No need to send token again
