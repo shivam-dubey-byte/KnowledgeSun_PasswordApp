@@ -1,11 +1,42 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
+import CryptoJS from "crypto-js";
 
 const ResetPassword = () => {
   const { token } = useParams(); // Extract token from URL
   const [newPassword, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
+
+  // AES encryption function
+  const encryptData = (data) => {
+    const key = CryptoJS.enc.Hex.parse("7c3932af93b283dae0c5173b9adffa299a87e33b92e13a9119e120d8249e199e"); // 32-byte key
+    const iv = CryptoJS.lib.WordArray.random(12); // 12-byte random IV for AES-GCM
+    const encrypted = CryptoJS.AES.encrypt(data, key, { iv: iv, mode: CryptoJS.mode.GCM, padding: CryptoJS.pad.NoPadding });
+    const ivBase64 = CryptoJS.enc.Base64.stringify(iv);
+    const encryptedDataBase64 = encrypted.ciphertext.toString(CryptoJS.enc.Base64);
+    const tagBase64 = encrypted.tag.toString(CryptoJS.enc.Base64); // GCM tag
+    return ivBase64 + encryptedDataBase64 + tagBase64;
+  };
+
+  // AES decryption function
+  const decryptData = (data) => {
+    const key = CryptoJS.enc.Hex.parse("7c3932af93b283dae0c5173b9adffa299a87e33b92e13a9119e120d8249e199e"); // 32-byte key
+    const ivBase64 = data.substring(0, 16); // Extract IV from the encrypted data
+    const encryptedDataBase64 = data.substring(16, data.length - 16); // Extract encrypted data
+    const tagBase64 = data.substring(data.length - 16); // Extract tag
+
+    const iv = CryptoJS.enc.Base64.parse(ivBase64);
+    const encryptedData = CryptoJS.enc.Base64.parse(encryptedDataBase64);
+    const tag = CryptoJS.enc.Base64.parse(tagBase64);
+
+    const decrypted = CryptoJS.AES.decrypt(
+      { ciphertext: encryptedData },
+      key,
+      { iv: iv, mode: CryptoJS.mode.GCM, padding: CryptoJS.pad.NoPadding, tag: tag }
+    );
+    return decrypted.toString(CryptoJS.enc.Utf8);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,14 +51,17 @@ const ResetPassword = () => {
       return;
     }
 
+    // Encrypt the new password before sending it to the backend
+    const encryptedPassword = encryptData(newPassword);
+
     // Construct API URL dynamically
-    const apiUrl = `https://knowledgesunapi.quantumsoftdev.in/auth/reset-password/${token}`;//`https://edu-auth.vercel.app/auth/reset-password/${token}`;
+    const apiUrl = `https://knowledgesunapi.quantumsoftdev.in/auth/reset-password/${token}`;
 
     try {
       const response = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ newPassword }), // No need to send token again
+        body: JSON.stringify({ data: encryptedPassword }), // Send encrypted password
       });
 
       const data = await response.json();
